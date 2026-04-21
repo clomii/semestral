@@ -21,10 +21,13 @@ Je potrebné postaviť (build) docker image v koreňovom adresári tohto projekt
 docker build -t ml-groundfiltering-app .
 ```
 
-### Spustenie testovania nad dodanými dátami z projektu
-Dáta z workshopu (`StA_last.laz` a `PK_last.laz`) boli nakopírované do priečinka `data/`. Pre spustenie testovania procesu priamo nad týmito reálnymi bodovými mračnami a preddefinovanými segmentami, použi tento príkaz (po zbuildovaní docker image):
+### Spustenie testovania cez CLI
 
-**Otestovanie nad dátami z Lokality 1 (Monastery St. Anna):**
+Spustenie adaptívneho filtru prebieha cez namapované *volumes*. Uistite sa, že používate správnu syntax pre Váš operačný systém.
+
+**Pre používateľov Linux / MacOS (Bash):**
+
+*Otestovanie nad dátami z Lokality 1 (Monastery St. Anna):*
 ```bash
 docker run --rm \
     -v $(pwd)/data:/app/data \
@@ -32,7 +35,7 @@ docker run --rm \
     ml-groundfiltering-app --las /app/data/StA_last.laz --geojson /app/data/StA_segment.geojson --outdir /app/output --epsg 31256
 ```
 
-**Otestovanie nad dátami z Lokality 2 (Oblasť PK):**
+*Otestovanie nad dátami z Lokality 2 (Oblasť PK):*
 ```bash
 docker run --rm \
     -v $(pwd)/data:/app/data \
@@ -40,9 +43,32 @@ docker run --rm \
     ml-groundfiltering-app --las /app/data/PK_last.laz --geojson /app/data/PK_segments.geojson --outdir /app/output --epsg 31256
 ```
 
+**Pre používateľov Windows (PowerShell):**
+
+*Otestovanie nad dátami z Lokality 1 (Monastery St. Anna):*
+```powershell
+docker run --rm -v "${PWD}/data:/app/data" -v "${PWD}/output:/app/output" ml-groundfiltering-app --las /app/data/StA_last.laz --geojson /app/data/StA_segment.geojson --outdir /app/output --epsg 31256
+```
+
+*Otestovanie nad dátami z Lokality 2 (Oblasť PK):*
+```powershell
+docker run --rm -v "${PWD}/data:/app/data" -v "${PWD}/output:/app/output" ml-groundfiltering-app --las /app/data/PK_last.laz --geojson /app/data/PK_segments.geojson --outdir /app/output --epsg 31256
+```
+
 > **Poznámka k fallback režimu:** V prípade, že nezadáš `--las` a `--geojson` príkazy a skutočné súbory chýbajú, skript si automaticky nageneruje simulované ("stub") údaje a vykoná testovaciu slučku naprázdno, aby overil funkčnosť kódovacieho frameworku.
 
-## Ako funguje ML proces
+## Praktická ukážka v Jupyter Notebook priamo vo VS Code
+
+Pre priame vizuálne a akademické demonštrovanie metód sme pripravili priamo spustiteľný `practical_comparison.ipynb`. Pre spustenie bez nutnosti lokálnych inštalácií, použite Jupyter Server dodávaný priamo v Docker kontajneri:
+
+1. Spustite premostenie Jupyter serveru (kód prispôsobený na **priame skopírovanie v akomkoľvek OS** do jedného riadku):
+   ```bash
+   docker run --rm -p 8888:8888 -v "${PWD}:/app" -w /app ml-groundfiltering-app jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root
+   ```
+2. V termináli vyhľadajte a **skopírujte URL adresu**, ktorá začína na `http://127.0.0.1:8888?token=...`
+3. Otvorte si súbor `practical_comparison.ipynb` priamo vo vašom prostredí **VS Code**.
+4. V notebook editore vpravo hore kliknite na **Select Kernel** (Vybrať Kernel) > **Existing Jupyter Server...**.
+5. Vložte skopírovanú URL z Terminálu a potvrďte. Váš lokálny VS Code ihneď nadviaže spojenie s AFwizard knižnicami v kontajneri. Následne už len spúšťajte bunky kódu priamo vo vašom IDE.
 
 1. **Vstup**: Prijme sa rozľahlý LiDAR dataset (`StA_last.laz`).
 2. **Segmentácia a Feature extrakcia**: Pomocou `laspy` sa pre každý lokálny segment získajú 3D charakteristiky.
