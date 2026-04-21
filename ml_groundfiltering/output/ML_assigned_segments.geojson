@@ -1,0 +1,48 @@
+{
+    "type": "FeatureCollection",
+    "name": "StA_segment",
+    "crs": {
+        "type": "name",
+        "properties": {
+            "name": "urn:ogc:def:crs:EPSG::31256"
+        }
+    },
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "id": null,
+                "pipeline": "filters/opals_robust.json"
+            },
+            "geometry": {
+                "type": "MultiPolygon",
+                "coordinates": [
+                    [
+                        [
+                            [
+                                19803.258364641668,
+                                312896.4014560457
+                            ],
+                            [
+                                20596.059728839402,
+                                312896.4014560457
+                            ],
+                            [
+                                20596.059728839402,
+                                312153.60384014936
+                            ],
+                            [
+                                19803.258364641668,
+                                312156.02337635745
+                            ],
+                            [
+                                19803.258364641668,
+                                312896.4014560457
+                            ]
+                        ]
+                    ]
+                ]
+            }
+        }
+    ]
+}

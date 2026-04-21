@@ -1,0 +1,1 @@
+{"metadata": {"author": "Marek", "example_data_url": "trial", "description": "trial 2025", "title": "Ground points in the water", "keywords": ["water"]}, "filters": [{"_backend": "lastools", "offset": 0.0, "spike": 0.30000000000000004, "step": 1.0}], "_backend": "pipeline", "_variability": [], "_major": 0, "_minor": 1}

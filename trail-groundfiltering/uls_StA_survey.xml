@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+    <platformSettings id="platform_uls" movePerSec_m="8"/>
+    <scannerSettings active="true" id="scanner_uls" trajectoryTimeInterval_s="0.01" pulseFreq_hz="200000" scanAngle_deg="90" scanFreq_hz="50"/>
+    <survey name="uls_survey" platform="data/platforms.xml#copter_linearpath" scanner="data/scanners_als.xml#riegl_vux-1uav22" scene="StA_helios_scene_small.xml#helios_scene">
+    <FWFSettings beamSampleQuality="3" winSize_ns="1.5"/>
+    
+    <leg>
+            <platformSettings x="20567.25658293936" y="312490.25635443616" z="424.166" template="platform_uls"/>
+            <scannerSettings template="scanner_uls" active="true"/>
+    </leg>
+    <leg>
+            <platformSettings x="20419.53541998753" y="312464.2091277861" z="437.446" template="platform_uls"/>
+            <scannerSettings template="scanner_uls" active="true"/>
+    </leg>
+    <leg>
+            <platformSettings x="20271.814257035698" y="312438.16190113605" z="408.176" template="platform_uls"/>
+            <scannerSettings template="scanner_uls" active="true"/>
+    </leg>
+    <leg>
+            <platformSettings x="20258.79064371068" y="312512.022482612" z="398.946" template="platform_uls"/>
+            <scannerSettings template="scanner_uls" active="true"/>
+    </leg>
+    <leg>
+            <platformSettings x="20406.51180666251" y="312538.06970926205" z="453.006" template="platform_uls"/>
+            <scannerSettings template="scanner_uls" active="true"/>
+    </leg>
+    <leg>
+            <platformSettings x="20554.232969614342" y="312564.1169359121" z="438.896" template="platform_uls"/>
+            <scannerSettings template="scanner_uls" active="true"/>
+    </leg>
+    <leg>
+            <platformSettings x="20541.20935628932" y="312637.977517388" z="434.586" template="platform_uls"/>
+            <scannerSettings template="scanner_uls" active="true"/>
+    </leg>
+    <leg>
+            <platformSettings x="20393.48819333749" y="312611.93029073795" z="450.526" template="platform_uls"/>
+            <scannerSettings template="scanner_uls" active="true"/>
+    </leg>
+    <leg>
+            <platformSettings x="20245.767030385658" y="312585.8830640879" z="394.096" template="platform_uls"/>
+            <scannerSettings template="scanner_uls" active="true"/>
+    </leg>
+    <leg>
+            <platformSettings x="20232.74341706064" y="312659.74364556384" z="394.086" template="platform_uls"/>
+            <scannerSettings template="scanner_uls" active="true"/>
+    </leg>
+    <leg>
+            <platformSettings x="20380.46458001247" y="312685.7908722139" z="420.846" template="platform_uls"/>
+            <scannerSettings template="scanner_uls" active="true"/>
+    </leg>
+    <leg>
+            <platformSettings x="20528.185742964302" y="312711.83809886395" z="423.406" template="platform_uls"/>
+            <scannerSettings template="scanner_uls" active="true"/>
+    </leg>
+    </survey>
+</document>

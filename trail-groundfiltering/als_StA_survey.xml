@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+    <platformSettings id="platform_als" movePerSec_m="60" z="1293.8933972507245" />
+    <scannerSettings active="true" id="scanner_als" pulseFreq_hz="100000" scanAngle_deg="45" scanFreq_hz="80" trajectoryTimeInterval_s="0.01"/>
+    <survey name="als_survey" platform="data/platforms.xml#sr22" scanner="data/scanners_als.xml#riegl_lms-q560" scene="StA_helios_scene.xml#helios_scene">
+    <FWFSettings beamSampleQuality="3" winSize_ns="1.5"/>
+    
+    <leg>
+            <platformSettings x="20257.404714285713" y="312613.025" template="platform_als"/>
+            <scannerSettings template="scanner_als" active="true"/>
+    </leg>
+    <leg>
+            <platformSettings x="20472.494" y="312746.59642857144" template="platform_als"/>
+            <scannerSettings template="scanner_als" active="false"/>
+    </leg>
+    <leg>
+            <platformSettings x="20577.583285714285" y="312575.7035714286" template="platform_als"/>
+            <scannerSettings template="scanner_als" active="true"/>
+    </leg>
+    <leg>
+            <platformSettings x="20356.60114285714" y="312456.8642857143" template="platform_als"/>
+            <scannerSettings template="scanner_als" active="false"/>
+    </leg>
+    </survey>
+</document>

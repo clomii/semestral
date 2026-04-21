@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+    <scene id="helios_scene" name="HELIOS scene">
+
+        <part>
+            <filter type="geotiffloader">
+                <param type="string" key="filepath" value="data/output/StA_last_filtered_sub.tiff" />
+            </filter>
+        </part>
+        <part>
+            <filter type="xyzloader">
+                <param type="string" key="filepath" value="data/output/StA_last_vegetation_sub.xyz" />
+                <param type="string" key="separator" value=" " />
+                <param type="double" key="voxelSize" value="0.5" />
+            </filter>
+        </part>
+    </scene>
+</document>
