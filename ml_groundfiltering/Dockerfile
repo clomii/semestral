@@ -41,7 +41,8 @@ RUN mkdir -p /app/data /app/output /app/filters && chown -R $MAMBA_USER:$MAMBA_U
 USER $MAMBA_USER
 
 # Use Micromamba entrypoint to activate the conda environment automatically
-ENTRYPOINT ["/usr/local/bin/_entrypoint.sh"]
+# and run python main.py as the base command
+ENTRYPOINT ["/usr/local/bin/_entrypoint.sh", "python", "main.py"]
 
-# Default command if nothing else is specified
-CMD ["python", "main.py"]
+# By default, we run without arguments if none are passed
+CMD []

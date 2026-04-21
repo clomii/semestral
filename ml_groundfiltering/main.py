@@ -58,7 +58,9 @@ def automate_filtration_process(las_file, geojson_file, output_dir, epsg, lastoo
                 feature['properties']['pipeline'] = assigned_pipelines[seg_id]
                 
         # Fyzicky uložíme upravený geojson mapovací súbor do výstupnej zložky
-        assigned_geojson_path = os.path.join(output_dir, "ML_assigned_segments.geojson")
+        input_basename = os.path.basename(geojson_file)
+        name_part, ext_part = os.path.splitext(input_basename)
+        assigned_geojson_path = os.path.join(output_dir, f"{name_part}_ML_assigned{ext_part}")
         os.makedirs(output_dir, exist_ok=True)
         
         with open(assigned_geojson_path, 'w') as f:
