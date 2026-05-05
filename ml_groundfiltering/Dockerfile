@@ -1,4 +1,4 @@
-FROM mambaorg/micromamba:1.5.3
+FROM mambaorg/micromamba:2.3.3
 
 # Need root just for some system prep and directory creation
 USER root
@@ -37,6 +37,13 @@ COPY . .
 
 # 5. Make sure volumes can be mounted properly
 RUN mkdir -p /app/data /app/output /app/filters && chown -R $MAMBA_USER:$MAMBA_USER /app
+
+# AFwizard 1.0.1 expects LASTools on Linux/macOS to be launched through a
+# `wine` command and looks for *.exe names. The current rapidlasso Linux build
+# provides native Linux binaries, so this shim executes the native binary. The
+# downloaded LASTools build is unlicensed, so demo mode is appended unless the
+# command already contains it.
+RUN printf '#!/bin/sh\nfor arg in "$@"; do\n  if [ "$arg" = "-demo" ]; then\n    exec "$@"\n  fi\ndone\nexec "$@" -demo\n' > /usr/local/bin/wine && chmod +x /usr/local/bin/wine
 
 USER $MAMBA_USER
 

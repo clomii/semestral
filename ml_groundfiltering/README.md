@@ -1,76 +1,153 @@
-# Automatická optimalizácia filtrácie oblaku bodov (AFwizard ML)
+# Automaticka optimalizacia ground filteringu pomocou ML a AFwizard
 
-Tento projekt poskytuje zdrojový kód pre realizáciu automatizácie ladenia parametrov filtračných algoritmov LiDAR bodového mračna za použitia strojového učenia, na základe nástroja AFwizard. Vďaka tomuto riešeniu odstraňujeme manuálnu operátorskú "human-in-the-loop" fázu (`af.pipeline_tuning`).
+Projekt riesi zadanie: automatizovat vyber filtrov pre LiDAR point cloud tak,
+aby vysledna klasifikacia ground bodov bola co najblizsia referencnemu vystupu
+z AFwizard workshopu / manualneho operatora.
 
-## Štruktúra projektu
+## Hlavna myslienka
 
-- `feature_extraction.py`: Skript, ktorý (v tomto návrhu) extrahuje geometrické vlastnosti bodového mračna pre špecifické polygónové segmenty v priestore. Príznaky zahŕňajú hustotu (density) a varianciu výšky.
-- `ml_optimizer.py`: Scikit-learn (RandomForest) model strojového učenia, ktorý pre daný segment a sadu jeho príznakov predpovedá, ktorá `.json` filtračná pipeline poskytuje najpresnejšie odfiltrovanie vegetácie a zanechá presný digitálny model terénu (DTM).
-- `main.py`: Hlavný spúšťací skript prepájajúci extrakciu a ML predikciu k autonómnemu spusteniu filtra na dopytovaný LAZ/LAS súbor.
-- `Dockerfile`: Konfigurácia pre beh vo vzdialenom/izolovanom reprodukovateľnom prostredí.
-- `requirements.txt`: Zoznam Python knižníc prerekvizít.
+AFwizard uz vie:
 
-## Spustenie pomocou Docker
+- nacitat LAS/LAZ dataset,
+- pouzit existujuce filtre z kniznice `.json` suborov,
+- zapisat do segmentacneho GeoJSON-u hodnotu `properties.pipeline`,
+- aplikovat priestorovo adaptivny filter cez CLI.
 
-Aplikácia je plne paralelizovaná v rámci Docker kontajnera, čo znamená, že nevyžaduje lokálnu inštaláciu Python závislostí.
+Problem je manualne rozhodnutie, ktory filter patri do ktoreho segmentu.
+Tento projekt nahradza operatora modelom:
 
-### Vytvorenie Docker Image
-Je potrebné postaviť (build) docker image v koreňovom adresári tohto projektu (`ml_groundfiltering`):
+1. Z referencnej segmentacie `data/PK_segments_assigned.geojson` nacita
+   manualne priradene AFwizard pipeline hashe.
+2. Kazdy polygon rozdeli na mensie dlazdice.
+3. Z bodov v kazdej dlazdici extrahuje geometricke priznaky: hustota,
+   variabilita vysky, relativny vyskovy rozsah, sklon roviny, roughness a
+   podiel vyssich bodov.
+4. Natrenuje `RandomForestClassifier`, ktory mapuje priznaky segmentu na
+   najlepsi AFwizard `pipeline` hash.
+5. Pre novy GeoJSON zapise predikovany `properties.pipeline`,
+   `pipeline_title` a `ml_confidence`.
+6. Vygeneruje prikaz na spustenie AFwizard batch filtracie.
 
-```bash
+## Dolezite subory
+
+- `feature_extraction.py` - realna extrakcia priznakov z LAS/LAZ bodov v
+  GeoJSON polygonoch. Povoluje aj vytvorenie trenovacich dlazdic.
+- `ml_optimizer.py` - trenovanie a ulozenie modelu. Cielova trieda je AFwizard
+  pipeline hash, nie nazov suboru.
+- `main.py` - hlavny CLI workflow: trenovanie/nacitanie modelu, predikcia,
+  zapis ML segmentacie a priprava AFwizard prikazu.
+- `filter_scoring.py` - pomocny skript na objektivne porovnanie kandidatskych
+  filtrov oproti referencnemu LAS/LAZ vystupu, kde ground body maju
+  `Classification == 2`.
+- `SEMINARNE_VYPRACOVANIE.md` - textove vypracovanie metodiky do semestralnej
+  prace.
+
+## Spustenie pre PK data
+
+Projekt je pripraveny na Docker, pretoze AFwizard/PDAL/GDAL zavislosti su na
+Windows tazkopadne.
+
+### Build image
+
+```powershell
 docker build -t ml-groundfiltering-app .
 ```
 
-### Spustenie testovania cez CLI
+### Trenovanie + predikcia ML segmentacie
 
-Spustenie adaptívneho filtru prebieha cez namapované *volumes*. Uistite sa, že používate správnu syntax pre Váš operačný systém.
+Predvolene sa trenuje z:
 
-**Pre používateľov Linux / MacOS (Bash):**
+- `data/PK_last.laz`
+- `data/PK_segments_assigned.geojson`
 
-*Otestovanie nad dátami z Lokality 1 (Monastery St. Anna):*
-```bash
-docker run --rm \
-    -v $(pwd)/data:/app/data \
-    -v $(pwd)/output:/app/output \
-    ml-groundfiltering-app --las /app/data/StA_last.laz --geojson /app/data/StA_segment.geojson --outdir /app/output --epsg 31256
-```
+a predikuje sa pre:
 
-*Otestovanie nad dátami z Lokality 2 (Oblasť PK):*
-```bash
-docker run --rm \
-    -v $(pwd)/data:/app/data \
-    -v $(pwd)/output:/app/output \
-    ml-groundfiltering-app --las /app/data/PK_last.laz --geojson /app/data/PK_segments.geojson --outdir /app/output --epsg 31256
-```
+- `data/PK_segments.geojson`
 
-**Pre používateľov Windows (PowerShell):**
-
-*Otestovanie nad dátami z Lokality 1 (Monastery St. Anna):*
 ```powershell
-docker run --rm -v "${PWD}/data:/app/data" -v "${PWD}/output:/app/output" ml-groundfiltering-app --las /app/data/StA_last.laz --geojson /app/data/StA_segment.geojson --outdir /app/output --epsg 31256
+docker run --rm -v "${PWD}:/app" -w /app ml-groundfiltering-app --retrain
 ```
 
-*Otestovanie nad dátami z Lokality 2 (Oblasť PK):*
+Vystup:
+
+- model `optimizer_model.pkl`,
+- ML segmentacia `output/PK_segments_ML_assigned.geojson`,
+- pripraveny `afwizard ...` prikaz.
+
+### Skutocne spustenie AFwizard
+
+Filtre z workshopu pouzivaju backend `lastools`. V projekte je pripraveny
+launcher, ktory namapuje Linux LASTools balik do Docker kontajnera:
+
 ```powershell
-docker run --rm -v "${PWD}/data:/app/data" -v "${PWD}/output:/app/output" ml-groundfiltering-app --las /app/data/PK_last.laz --geojson /app/data/PK_segments.geojson --outdir /app/output --epsg 31256
+.\run_pk_with_lastools.ps1 -LastoolsDir tools
 ```
 
-> **Poznámka k fallback režimu:** V prípade, že nezadáš `--las` a `--geojson` príkazy a skutočné súbory chýbajú, skript si automaticky nageneruje simulované ("stub") údaje a vykoná testovaciu slučku naprázdno, aby overil funkčnosť kódovacieho frameworku.
+Ak priecinok `tools` este neexistuje, stiahni a rozbal Linux LASTools balik:
 
-## Praktická ukážka v Jupyter Notebook priamo vo VS Code
+```powershell
+New-Item -ItemType Directory -Force tools
+curl.exe -L -o tools\LAStools.tar.gz https://downloads.rapidlasso.de/LAStools.tar.gz
+tar -xzf tools\LAStools.tar.gz -C tools
+.\run_pk_with_lastools.ps1 -LastoolsDir tools
+```
 
-Pre priame vizuálne a akademické demonštrovanie metód sme pripravili priamo spustiteľný `practical_comparison.ipynb`. Pre spustenie bez nutnosti lokálnych inštalácií, použite Jupyter Server dodávaný priamo v Docker kontajneri:
+Launcher:
 
-1. Spustite premostenie Jupyter serveru (kód prispôsobený na **priame skopírovanie v akomkoľvek OS** do jedného riadku):
-   ```bash
-   docker run --rm -p 8888:8888 -v "${PWD}:/app" -w /app ml-groundfiltering-app jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root
-   ```
-2. V termináli vyhľadajte a **skopírujte URL adresu**, ktorá začína na `http://127.0.0.1:8888?token=...`
-3. Otvorte si súbor `practical_comparison.ipynb` priamo vo vašom prostredí **VS Code**.
-4. V notebook editore vpravo hore kliknite na **Select Kernel** (Vybrať Kernel) > **Existing Jupyter Server...**.
-5. Vložte skopírovanú URL z Terminálu a potvrďte. Váš lokálny VS Code ihneď nadviaže spojenie s AFwizard knižnicami v kontajneri. Následne už len spúšťajte bunky kódu priamo vo vašom IDE.
+- skontroluje `tools/bin/lasground_new64`,
+- vytvori kompatibilny nazov `lasground_new64.exe`, ktory AFwizard ocakava,
+- namapuje LASTools do kontajnera ako `/lastools`,
+- spusti ML vyber filtrov a AFwizard batch filtering.
 
-1. **Vstup**: Prijme sa rozľahlý LiDAR dataset (`StA_last.laz`).
-2. **Segmentácia a Feature extrakcia**: Pomocou `laspy` sa pre každý lokálny segment získajú 3D charakteristiky.
-3. **ML Optimizer**: Model na pozadí, v reálnom prostredí trénovaný na HELIOS++ syntetických "ground truth" dátach, posúdi segment a vráti názov adaptívnej pipeline vhodnej pre daný lesný alebo zrázný terén.
-4. **Automatické priradenie**: Systém prepíše pipeline segmentom v AFwizard logike a cez `bash` zavolá `afwizard --segmentation --output-dir`. Modifikované segmenty sa použijú na hromadnú optimalizovanú filtráciu.
+Vystupy po uspesnom PK behu:
+
+- `output/PK_segments_ML_assigned.geojson`,
+- `output/PK_last_filtered.las`,
+- volitelne DTM raster z ground bodov: `output/PK_last_filtered_dtm.tiff`.
+
+AFwizard 1.0.1 vie po vytvoreni LAS suboru zahlasit internu chybu pri vlastnej
+GeoTIFF rasterizacii (`TypeError: string indices must be integers`). Launcher
+preto po AFwizard behu automaticky vytvori DTM cez `rasterize_dtm.py`, ktory
+berie iba ground body `Classification == 2`.
+
+Pri PK datach sa EPSG kod nacita z GeoJSON-u ako `25833`. Pri StA datach je to
+`31256`.
+
+Poznamka: stiahnuty LASTools balik je nelicencovany, preto Docker image obsahuje
+kompatibilny `wine` shim, ktory spusta natívny Linux LASTools v demo rezime.
+Na produkcne alebo komercne pouzitie treba riesit licenciu rapidlasso.
+
+## Objektivne trenovanie podla zhody s ground points
+
+Ak mas pre jeden segment viac kandidatskych filtrov a pre kazdy vies vyrobit
+samostatny filtrovany LAS/LAZ, cielovy label sa nema volit rucne. Vyberie sa
+filter s najvyssim F1/IoU oproti referencii:
+
+```powershell
+docker run --rm --entrypoint /usr/local/bin/_entrypoint.sh -v "${PWD}:/app" -w /app ml-groundfiltering-app python filter_scoring.py `
+  --reference data/output/PK_last_filtered.las `
+  --segmentation data/PK_segments.geojson `
+  --candidate da3ef59d40b2853b00710542a0dc72c7d2ddc9da=path/to/candidate_land.las `
+  --candidate 0f94f36544761b2337ee37a7b41d160290486ed2=path/to/candidate_water.las `
+  --title da3ef59d40b2853b00710542a0dc72c7d2ddc9da="Ground points over land" `
+  --title 0f94f36544761b2337ee37a7b41d160290486ed2="Ground points in the water" `
+  --out output/pk_candidate_scores.json `
+  --assigned-out output/PK_segments_scored_assigned.geojson
+```
+
+Tento skript porovnava masku `Classification == 2` medzi referenciou a
+kandidatom. Najlepsi filter pre segment je ten, ktory maximalizuje najma F1
+alebo IoU. Takto sa z problemu "operator vizualne vybera filter" stane
+supervizovana ML uloha. Vystup `PK_segments_scored_assigned.geojson` sa potom
+da pouzit ako `--train-geojson` pre `main.py`.
+
+## Co treba obhajit
+
+Model nie je priamo nahrada za samotny ground-filter algoritmus. Je to
+meta-optimalizator: na zaklade vlastnosti terenu vybera konfiguraciu filtra,
+ktoru potom vykona AFwizard/PDAL/LASTools/OPALS.
+
+Pri malom mnozstve manualnych segmentov je generalizacia obmedzena. Preto kod
+robi dlazdicovanie polygonov, aby z jednej referencnej oblasti vzniklo viac
+lokalnych trenovacich vzoriek. Pre realne nasadenie treba pridat viac lokalit,
+viac typov terenu a viac kandidatskych filtrov.

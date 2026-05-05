@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+optimizer_model.pkl
+tools/LAStools.tar.gz
+tools/
+output/*.las
+output/*.laz
+output/*.tif
+output/*.tiff
+output/*.log
+output/ground_points_*.json
