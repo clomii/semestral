@@ -9,3 +9,4 @@ output/*.tif
 output/*.tiff
 output/*.log
 output/ground_points_*.json
+output/visualizations/

@@ -41,6 +41,8 @@ Tento projekt nahradza operatora modelom:
   `Classification == 2`.
 - `SEMINARNE_VYPRACOVANIE.md` - textove vypracovanie metodiky do semestralnej
   prace.
+- `ML_GroundFiltering_Workflow.ipynb` - vysvetlovaci Jupyter notebook, ktory
+  ukazuje proces od dat cez trening a predikciu az po overenie metrikami.
 
 ## Spustenie pre PK data
 
