@@ -4,6 +4,7 @@ import os
 import re
 import shlex
 import subprocess
+import sys
 from typing import Iterable, List, Optional
 
 from feature_extraction import extract_tiled_feature_records, get_feature_identifier
@@ -35,7 +36,8 @@ def _build_afwizard_command(
     lastools_dir: Optional[str],
 ) -> List[str]:
     command = [
-        "afwizard",
+        sys.executable,
+        "afwizard_fixed_cli.py",
         f"--dataset={las_file}",
         f"--dataset-crs=EPSG:{epsg}",
         f"--segmentation={assigned_geojson_path}",

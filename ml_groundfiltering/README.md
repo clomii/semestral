@@ -103,12 +103,13 @@ Vystupy po uspesnom PK behu:
 
 - `output/PK_segments_ML_assigned.geojson`,
 - `output/PK_last_filtered.las`,
-- volitelne DTM raster z ground bodov: `output/PK_last_filtered_dtm.tiff`.
+- AFwizard GeoTIFF raster: `output/PK_last_filtered.tiff`,
+- DTM raster iba z ground bodov: `output/PK_last_filtered_dtm.tiff`.
 
-AFwizard 1.0.1 vie po vytvoreni LAS suboru zahlasit internu chybu pri vlastnej
-GeoTIFF rasterizacii (`TypeError: string indices must be integers`). Launcher
-preto po AFwizard behu automaticky vytvori DTM cez `rasterize_dtm.py`, ktory
-berie iba ground body `Classification == 2`.
+Projekt pouziva `afwizard_fixed_cli.py`, co je kompatibilny wrapper okolo
+AFwizard 1.0.1 CLI. Opravuje zmenu v novsom `python-pdal`, kde sa metadata
+vracaju ako JSON text namiesto objektu. Vdaka tomu prebehne aj povodna AFwizard
+GeoTIFF rasterizacia bez chyby.
 
 Pri PK datach sa EPSG kod nacita z GeoJSON-u ako `25833`. Pri StA datach je to
 `31256`.
