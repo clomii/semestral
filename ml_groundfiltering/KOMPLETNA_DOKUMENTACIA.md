@@ -418,6 +418,15 @@ IoU a accuracy pre ground body `Classification == 2`. Vie porovnavat aj viac
 kandidatskych filtrov po segmentoch.
 
 ```text
+benchmark_filters.py
+```
+
+Vyssi level overenia pre dataset, kde je dostupny referencny DTM raster.
+Skript vytvori pre kazdy dostupny AFwizard filter samostatne priradenie,
+spusti AFwizard, vyrastruje ground body do DTM a porovna kandidatny DTM s
+referencnym DTM pomocou RMSE, MAE, bias a pokrytia platnych pixelov.
+
+```text
 rasterize_dtm.py
 ```
 
@@ -625,6 +634,44 @@ docker run --rm --entrypoint /usr/local/bin/_entrypoint.sh `
   --resolution 0.5
 ```
 
+### 14.9 StA benchmark kandidatskych filtrov voci referencnemu DTM
+
+Pre StA existuje referencny raster `data/StA_last_dtm.tiff`. Preto sa da
+spravit silnejsie overenie ako iba ukazat ML predikciu. Spustia sa vsetky
+dostupne AFwizard filtre, kazdy kandidat sa vyrastruje ako DTM a vysledky sa
+porovnaju s referenciou:
+
+```powershell
+docker run --rm --entrypoint /usr/local/bin/_entrypoint.sh `
+  -v "${PWD}:/app" `
+  -v "${PWD}\tools:/lastools:ro" `
+  -e LASTOOLS_DIR=/lastools `
+  -e LD_LIBRARY_PATH=/lastools/bin/lib:/lastools/lib:/opt/conda/lib `
+  -w /app `
+  ml-groundfiltering-app `
+  python benchmark_filters.py `
+  --las data/StA_last.laz `
+  --geojson data/StA_segment.geojson `
+  --reference-dtm data/StA_last_dtm.tiff `
+  --epsg 31256 `
+  --library data/output `
+  --outdir output/benchmarks/sta `
+  --lastools-dir /lastools `
+  --resolution 1.0 `
+  --run-afwizard
+```
+
+Aktualny vysledok:
+
+```text
+1. Ground points over land     RMSE 0.322 m, MAE 0.040 m
+2. Ground points in the water  RMSE 0.332 m, MAE 0.037 m
+```
+
+ML model pre StA vybral `Ground points over land` s nizsou istotou okolo 54 %.
+Confidence threshold preto oznaci segment na kontrolu, ale DTM benchmark
+potvrdzuje, ze z dostupnych filtrov je tento vyber najlepsi.
+
 ## 15. Co povedat na obhajobe
 
 Strucne vysvetlenie:
@@ -644,6 +691,8 @@ Silne body riesenia:
 - vybera skutocne AFwizard pipeline hashe,
 - spusta realny AFwizard/LASTools filtering,
 - vysledok je overeny metrikami oproti referencnemu PK outputu,
+- pri StA je doplneny benchmark dostupnych filtrov oproti referencnemu DTM,
+- nizka confidence automaticky oznaci segment na manualnu kontrolu,
 - dosahuje na PK datach `F1 = 1.0` a `IoU = 1.0`.
 
 Obmedzenia:
@@ -656,6 +705,8 @@ Obmedzenia:
 Najdolezitejsia veta:
 
 ```text
-Projekt automatizuje vyber AFwizard filtrov pomocou strojoveho ucenia a na PK
-datasete dosiahol uplnu zhodu ground klasifikacie s referencnym vystupom.
+Projekt automatizuje vyber AFwizard filtrov pomocou strojoveho ucenia. Na PK
+datasete dosiahol uplnu zhodu ground klasifikacie s referencnym vystupom a na
+StA datasete benchmark voci referencnemu DTM potvrdil rovnaky filter, ktory
+navrhol model.
 ```

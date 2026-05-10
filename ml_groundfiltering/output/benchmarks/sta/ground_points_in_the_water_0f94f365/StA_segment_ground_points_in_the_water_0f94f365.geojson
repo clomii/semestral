@@ -12,13 +12,10 @@
       "type": "Feature",
       "properties": {
         "id": null,
-        "pipeline": "da3ef59d40b2853b00710542a0dc72c7d2ddc9da",
-        "pipeline_title": "Ground points over land",
-        "pipeline_key": "ml_optimizer",
-        "ml_confidence": 0.5405,
-        "ml_confidence_threshold": 0.7,
-        "ml_requires_review": true,
-        "ml_review_reason": "Predicted filter confidence is below the configured threshold."
+        "pipeline": "0f94f36544761b2337ee37a7b41d160290486ed2",
+        "pipeline_title": "Ground points in the water",
+        "pipeline_key": "candidate_benchmark",
+        "benchmark_filter_path": "data/output/ground_points_in_the_water.json"
       },
       "geometry": {
         "type": "MultiPolygon",

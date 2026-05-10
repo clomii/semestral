@@ -9,6 +9,7 @@ param(
     [string]$Library = "data/output",
     [string]$Epsg = "25833",
     [double]$DtmResolution = 0.5,
+    [double]$ConfidenceThreshold = 0.7,
     [switch]$DryRun,
     [switch]$NoRetrain,
     [switch]$SkipDtm
@@ -142,7 +143,8 @@ $dockerArgs = @(
     "--train-geojson", $TrainGeojson,
     "--outdir", $OutDir,
     "--library", $Library,
-    "--lastools", "/lastools"
+    "--lastools", "/lastools",
+    "--confidence-threshold", "$ConfidenceThreshold"
 )
 
 if (-not $NoRetrain) {

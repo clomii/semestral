@@ -25,7 +25,8 @@ Tento projekt nahradza operatora modelom:
 4. Natrenuje `RandomForestClassifier`, ktory mapuje priznaky segmentu na
    najlepsi AFwizard `pipeline` hash.
 5. Pre novy GeoJSON zapise predikovany `properties.pipeline`,
-   `pipeline_title` a `ml_confidence`.
+   `pipeline_title`, `ml_confidence` a priznak `ml_requires_review`, ak je
+   istota nizsia ako nastavena hranica.
 6. Vygeneruje prikaz na spustenie AFwizard batch filtracie.
 
 ## Dolezite subory
@@ -39,6 +40,8 @@ Tento projekt nahradza operatora modelom:
 - `filter_scoring.py` - pomocny skript na objektivne porovnanie kandidatskych
   filtrov oproti referencnemu LAS/LAZ vystupu, kde ground body maju
   `Classification == 2`.
+- `benchmark_filters.py` - spusti viac AFwizard filtrov, vytvori DTM pre kazdy
+  kandidat a porovna ho s referencnym DTM rasterom pomocou RMSE/MAE.
 - `SEMINARNE_VYPRACOVANIE.md` - textove vypracovanie metodiky do semestralnej
   prace.
 - `ML_GroundFiltering_Workflow.ipynb` - vysvetlovaci Jupyter notebook, ktory
@@ -143,6 +146,46 @@ kandidatom. Najlepsi filter pre segment je ten, ktory maximalizuje najma F1
 alebo IoU. Takto sa z problemu "operator vizualne vybera filter" stane
 supervizovana ML uloha. Vystup `PK_segments_scored_assigned.geojson` sa potom
 da pouzit ako `--train-geojson` pre `main.py`.
+
+## Lepsi level: benchmark filtrov voci referencnemu DTM
+
+Ak existuje referencny DTM raster, napr. `data/StA_last_dtm.tiff`, da sa overit
+aj dataset bez rucne priradeneho GeoJSON-u. Skript `benchmark_filters.py`
+spravi pre kazdy dostupny AFwizard filter vlastnu segmentaciu, spusti AFwizard,
+vyrasterizuje ground body do DTM a porovna ich s referencnym DTM.
+
+Priklad pre StA:
+
+```powershell
+docker run --rm --entrypoint /usr/local/bin/_entrypoint.sh `
+  -v "${PWD}:/app" `
+  -v "${PWD}\tools:/lastools:ro" `
+  -e LASTOOLS_DIR=/lastools `
+  -e LD_LIBRARY_PATH=/lastools/bin/lib:/lastools/lib:/opt/conda/lib `
+  -w /app `
+  ml-groundfiltering-app `
+  python benchmark_filters.py `
+  --las data/StA_last.laz `
+  --geojson data/StA_segment.geojson `
+  --reference-dtm data/StA_last_dtm.tiff `
+  --epsg 31256 `
+  --library data/output `
+  --outdir output/benchmarks/sta `
+  --lastools-dir /lastools `
+  --resolution 1.0 `
+  --run-afwizard
+```
+
+V aktualnom behu benchmark potvrdil rovnaky filter, ktory navrhol model:
+
+```text
+Ground points over land     RMSE 0.322 m, MAE 0.040 m
+Ground points in the water  RMSE 0.332 m, MAE 0.037 m
+```
+
+Pre StA ma model nizsiu istotu okolo 54 %, preto je tento segment oznaceny na
+kontrolu. Benchmark vsak ukazuje, ze z dostupnych filtrov je stale najlepsi
+`Ground points over land`.
 
 ## Co treba obhajit
 

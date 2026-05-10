@@ -14,11 +14,8 @@
         "id": null,
         "pipeline": "da3ef59d40b2853b00710542a0dc72c7d2ddc9da",
         "pipeline_title": "Ground points over land",
-        "pipeline_key": "ml_optimizer",
-        "ml_confidence": 0.5405,
-        "ml_confidence_threshold": 0.7,
-        "ml_requires_review": true,
-        "ml_review_reason": "Predicted filter confidence is below the configured threshold."
+        "pipeline_key": "candidate_benchmark",
+        "benchmark_filter_path": "data/output/ground_points_over_land.json"
       },
       "geometry": {
         "type": "MultiPolygon",

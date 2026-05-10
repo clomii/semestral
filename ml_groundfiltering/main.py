@@ -67,6 +67,7 @@ def automate_filtration_process(
     retrain: bool,
     cell_size: float,
     min_points: int,
+    confidence_threshold: float,
     run_afwizard: bool,
 ) -> None:
     print("==================================================")
@@ -119,10 +120,13 @@ def automate_filtration_process(
     for record in segment_records:
         prediction = optimizer.predict_from_samples(record["tile_features"])
         assigned_predictions[record["segment_id"]] = prediction
+        review_note = ""
+        if prediction.confidence < confidence_threshold:
+            review_note = " [manual review recommended]"
         print(
             f"   {record['segment_id']}: {prediction.title} "
             f"({prediction.pipeline}, confidence={prediction.confidence:.2f}, "
-            f"tiles={len(record['tile_features'])})"
+            f"tiles={len(record['tile_features'])}){review_note}"
         )
 
     print("\n4. Writing ML-assigned AFwizard segmentation...")
@@ -140,6 +144,14 @@ def automate_filtration_process(
         properties["pipeline_title"] = prediction.title
         properties["pipeline_key"] = "ml_optimizer"
         properties["ml_confidence"] = round(prediction.confidence, 4)
+        properties["ml_confidence_threshold"] = confidence_threshold
+        properties["ml_requires_review"] = prediction.confidence < confidence_threshold
+        if prediction.confidence < confidence_threshold:
+            properties["ml_review_reason"] = (
+                "Predicted filter confidence is below the configured threshold."
+            )
+        else:
+            properties.pop("ml_review_reason", None)
 
     input_basename = os.path.basename(geojson_file)
     name_part, ext_part = os.path.splitext(input_basename)
@@ -227,6 +239,12 @@ if __name__ == "__main__":
         help="Minimum points required for a training tile",
     )
     parser.add_argument(
+        "--confidence-threshold",
+        type=float,
+        default=0.7,
+        help="Flag ML filter assignments below this confidence for manual review",
+    )
+    parser.add_argument(
         "--run-afwizard",
         action="store_true",
         help="Actually execute AFwizard after writing the ML-assigned segmentation",
@@ -247,5 +265,6 @@ if __name__ == "__main__":
         retrain=args.retrain,
         cell_size=args.cell_size,
         min_points=args.min_points,
+        confidence_threshold=args.confidence_threshold,
         run_afwizard=args.run_afwizard,
     )

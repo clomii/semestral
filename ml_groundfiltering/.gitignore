@@ -3,6 +3,9 @@ __pycache__/
 optimizer_model.pkl
 tools/LAStools.tar.gz
 tools/
+FINAL/
+FINAL.zip
+trail-groundfiltering/
 output/*.las
 output/*.laz
 output/*.tif
@@ -10,3 +13,8 @@ output/*.tiff
 output/*.log
 output/ground_points_*.json
 output/visualizations/
+output/benchmarks/**/*.las
+output/benchmarks/**/*.laz
+output/benchmarks/**/*.tif
+output/benchmarks/**/*.tiff
+output/benchmarks/**/output.log

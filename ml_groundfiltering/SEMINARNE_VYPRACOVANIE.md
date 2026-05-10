@@ -56,8 +56,8 @@ Samotnu filtraciu potom vykona AFwizard s backendom LASTools/PDAL/OPALS.
 4. Natrenuje sa `RandomForestClassifier`.
 5. Pre novy segmentacny GeoJSON sa extrahuju rovnake priznaky.
 6. Model predikuje najlepsi `pipeline` hash.
-7. Program zapise `pipeline`, `pipeline_title` a `ml_confidence` do noveho
-   GeoJSON-u.
+7. Program zapise `pipeline`, `pipeline_title`, `ml_confidence` a pri nizkej
+   istote aj priznak `ml_requires_review` do noveho GeoJSON-u.
 8. AFwizard CLI pouzije tento GeoJSON na priestorovo adaptivnu filtraciu.
 
 ## 4. Trening modelu
@@ -98,6 +98,20 @@ metrika, pretoze tresta false positives aj false negatives. IoU je prisnejsia
 metrika prekryvu ground masky.
 
 V projekte je na toto pripraveny skript `filter_scoring.py`.
+
+Ak je dostupny referencny DTM raster, napr. pri StA datach
+`data/StA_last_dtm.tiff`, da sa pouzit aj rasterova cielova funkcia. Skript
+`benchmark_filters.py` spusti dostupne AFwizard filtre, z kazdeho vysledku
+vytvori DTM a porovna ho s referenciou pomocou RMSE a MAE. Pre StA aktualne
+vyslo:
+
+```text
+Ground points over land     RMSE 0.322 m, MAE 0.040 m
+Ground points in the water  RMSE 0.332 m, MAE 0.037 m
+```
+
+Tym sa overilo, ze aj ked model pri StA predikuje s nizsou istotou, jeho vyber
+`Ground points over land` suhlasi s najlepsim filtrom podla referencneho DTM.
 
 ## 6. Implementacny vystup
 

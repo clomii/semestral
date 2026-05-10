@@ -16,7 +16,9 @@
         "pipeline": "da3ef59d40b2853b00710542a0dc72c7d2ddc9da",
         "pipeline_title": "Ground points over land",
         "pipeline_key": "ml_optimizer",
-        "ml_confidence": 0.9626
+        "ml_confidence": 0.9626,
+        "ml_confidence_threshold": 0.7,
+        "ml_requires_review": false
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -284,7 +286,9 @@
         "pipeline": "0f94f36544761b2337ee37a7b41d160290486ed2",
         "pipeline_title": "Ground points in the water",
         "pipeline_key": "ml_optimizer",
-        "ml_confidence": 0.9522
+        "ml_confidence": 0.9522,
+        "ml_confidence_threshold": 0.7,
+        "ml_requires_review": false
       },
       "geometry": {
         "type": "MultiPolygon",
