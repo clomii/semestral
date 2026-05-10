@@ -1,0 +1,34 @@
+[
+  {
+    "candidate_key": "ground_points_over_land_da3ef59d",
+    "pipeline_title": "Ground points over land",
+    "pipeline_hash": "da3ef59d40b2853b00710542a0dc72c7d2ddc9da",
+    "filtered_las": "output/benchmarks/sta/ground_points_over_land_da3ef59d/StA_last_filtered.las",
+    "dtm_tiff": "output/benchmarks/sta/ground_points_over_land_da3ef59d/StA_last_filtered_dtm.tiff",
+    "assigned_geojson": "output/benchmarks/sta/ground_points_over_land_da3ef59d/StA_segment_ground_points_over_land_da3ef59d.geojson",
+    "rmse": 0.3224674190484477,
+    "mae": 0.03979035528067061,
+    "bias": 0.003978348793721507,
+    "median_abs": 0.018753417968753183,
+    "p95_abs": 0.08169091796872863,
+    "valid_pixels": 588793,
+    "coverage_ratio": 0.9787914906633021,
+    "rank": 1
+  },
+  {
+    "candidate_key": "ground_points_in_the_water_0f94f365",
+    "pipeline_title": "Ground points in the water",
+    "pipeline_hash": "0f94f36544761b2337ee37a7b41d160290486ed2",
+    "filtered_las": "output/benchmarks/sta/ground_points_in_the_water_0f94f365/StA_last_filtered.las",
+    "dtm_tiff": "output/benchmarks/sta/ground_points_in_the_water_0f94f365/StA_last_filtered_dtm.tiff",
+    "assigned_geojson": "output/benchmarks/sta/ground_points_in_the_water_0f94f365/StA_segment_ground_points_in_the_water_0f94f365.geojson",
+    "rmse": 0.3317329991872834,
+    "mae": 0.03738861129515958,
+    "bias": 0.011437052088940542,
+    "median_abs": 0.0150473632812691,
+    "p95_abs": 0.07694934082030039,
+    "valid_pixels": 588787,
+    "coverage_ratio": 0.9787815164466521,
+    "rank": 2
+  }
+]

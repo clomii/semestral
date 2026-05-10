@@ -1,0 +1,5 @@
+ml_groundfiltering/FINAL/**/*.las filter=lfs diff=lfs merge=lfs -text
+ml_groundfiltering/FINAL/**/*.laz filter=lfs diff=lfs merge=lfs -text
+ml_groundfiltering/FINAL/**/*.tif filter=lfs diff=lfs merge=lfs -text
+ml_groundfiltering/FINAL/**/*.tiff filter=lfs diff=lfs merge=lfs -text
+ml_groundfiltering/FINAL/**/*.pkl filter=lfs diff=lfs merge=lfs -text

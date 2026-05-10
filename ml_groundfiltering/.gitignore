@@ -3,7 +3,6 @@ __pycache__/
 optimizer_model.pkl
 tools/LAStools.tar.gz
 tools/
-FINAL/
 FINAL.zip
 trail-groundfiltering/
 output/*.las

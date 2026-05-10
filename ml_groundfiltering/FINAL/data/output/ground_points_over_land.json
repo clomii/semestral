@@ -1,0 +1,1 @@
+{"metadata": {"author": "Marek", "keywords": ["ground"], "description": "first try", "title": "Ground points over land", "example_data_url": "trial 2025"}, "filters": [{"offset": 0.0, "_backend": "lastools", "spike": 0.4, "step": 1.4}, {"offset": 0.0, "_backend": "lastools", "spike": 0.5, "step": 1.0}], "_backend": "pipeline", "_variability": [], "_major": 0, "_minor": 1}
