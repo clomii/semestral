@@ -187,7 +187,7 @@ Pre StA ma model nizsiu istotu okolo 54 %, preto je tento segment oznaceny na
 kontrolu. Benchmark vsak ukazuje, ze z dostupnych filtrov je stale najlepsi
 `Ground points over land`.
 
-## Co treba obhajit
+## Zlepsenia na zaver
 
 Model nie je priamo nahrada za samotny ground-filter algoritmus. Je to
 meta-optimalizator: na zaklade vlastnosti terenu vybera konfiguraciu filtra,
